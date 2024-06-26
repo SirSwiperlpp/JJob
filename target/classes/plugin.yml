@@ -1,0 +1,14 @@
+name: JJob
+version: '1.0'
+main: de.sirswiperlpp.jjob.Main.Main
+api-version: '1.20'
+
+commands:
+  job:
+    description: Job Command
+    permission: job.use
+
+permissions:
+  job.use:
+    description: Job Permission
+    default: true

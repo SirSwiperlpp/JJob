@@ -1,0 +1,11 @@
+de\sirswiperlpp\jjob\Provider\JobPROV.class
+de\sirswiperlpp\jjob\SQL\MySQL.class
+de\sirswiperlpp\jjob\Listener\PlayerListener.class
+de\sirswiperlpp\jjob\Listener\MinerListener$1.class
+de\sirswiperlpp\jjob\API\EcoAPI.class
+de\sirswiperlpp\jjob\Lang\Language.class
+de\sirswiperlpp\jjob\Listener\MinerListener.class
+de\sirswiperlpp\jjob\Provider\EcoPROV.class
+de\sirswiperlpp\jjob\Commands\JobCommand.class
+de\sirswiperlpp\jjob\Main\Main.class
+de\sirswiperlpp\jjob\SQL\JobSQL.class
