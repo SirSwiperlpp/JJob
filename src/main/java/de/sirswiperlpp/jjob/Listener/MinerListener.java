@@ -3,37 +3,74 @@ package de.sirswiperlpp.jjob.Listener;
 import de.sirswiperlpp.jjob.API.EcoAPI;
 import de.sirswiperlpp.jjob.Lang.Language;
 import de.sirswiperlpp.jjob.Main.Main;
+import de.sirswiperlpp.jjob.Manager.BlockDataManager;
+import de.sirswiperlpp.jjob.Manager.BossBarManager;
 import de.sirswiperlpp.jjob.Provider.JobPROV;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.UUID;
 
 public class MinerListener implements Listener
 {
 
     static Language language = new Language(new File(Main.getInstance().getDataFolder(), "lang.ini"));
 
+    private final Main plugin;
+
+    private final BlockDataManager blockDataManager;
+
+    public MinerListener(Main plugin, BlockDataManager blockDataManager) {
+        this.plugin = plugin;
+        this.blockDataManager = blockDataManager;
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        BlockDataManager.setBlockPlacedByPlayer(event.getBlock(), player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        if (blockDataManager.isBlockPlacedByPlayer(event.getBlock())) {
+            UUID playerUUID = blockDataManager.getPlayerWhoPlacedBlock(event.getBlock());
+            Bukkit.getServer().getLogger().info("BLOCK IS PLACED BY PLAYER");
+        }
+    }
+
     @EventHandler
     public void onMiner(final BlockBreakEvent event) throws SQLException {
-        final Block block = event.getBlock();
-        final Material material = block.getType();
         final Player player = event.getPlayer();
-
+        final Material material = event.getBlock().getType();
         ItemStack tool = player.getInventory().getItemInMainHand();
 
         if (!Objects.equals(JobPROV.getCJob(player), "miner"))
             return;
+
+        if (blockDataManager.isBlockPlacedByPlayer(event.getBlock())) {
+            UUID playerUUID = blockDataManager.getPlayerWhoPlacedBlock(event.getBlock());
+            Bukkit.getServer().getLogger().info("BLOCK IS PLACED BY PLAYER");
+            return;
+        }
 
         if (tool.hasItemMeta() && tool.getItemMeta().hasEnchants()) {
             if (tool.getItemMeta().hasEnchant(Enchantment.SILK_TOUCH)) {
@@ -41,148 +78,103 @@ public class MinerListener implements Listener
             }
         }
 
+        String job = JobPROV.getCJob(player);
+        int xpIncrement = 0;
 
-        switch (material)
-        {
+        switch (material) {
             case COAL_ORE:
-                //1$
-                EcoAPI.addBalance(player, 1);
-                String coal_msg = "§a+1$, +1xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(coal_msg));
-                //1xp
-                String coal_pJob = JobPROV.getCJob(player);
-                int coal_c_xp = JobPROV.getCXP(player, coal_pJob);
-                int coal_xp = coal_c_xp + 1;
-                JobPROV.updateCXP(player, coal_xp, coal_pJob);
-                break;
-
             case DEEPSLATE_COAL_ORE:
-                //1$
+                BossBarManager.removeBossBar(player);
                 EcoAPI.addBalance(player, 1);
-                String d_coal_msg = "§a+1$, +1xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(d_coal_msg));
-                //1xp
-                String d_coal_pJob = JobPROV.getCJob(player);
-                int d_coal_c_xp = JobPROV.getCXP(player, d_coal_pJob);
-                int d_coal_xp = d_coal_c_xp + 1;
-                JobPROV.updateCXP(player, d_coal_xp, d_coal_pJob);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+1$, +1xp"));
+                xpIncrement = 1;
                 break;
 
             case IRON_ORE:
-                //1$
-                EcoAPI.addBalance(player, 1);
-                String iron_msg = "§a+1$, +2xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(iron_msg));
-                //2xp
-                String iron_pJob = JobPROV.getCJob(player);
-                int iron_c_xp = JobPROV.getCXP(player, iron_pJob);
-                int iron_xp = iron_c_xp + 2;
-                JobPROV.updateCXP(player, iron_xp, iron_pJob);
-                break;
-
             case DEEPSLATE_IRON_ORE:
-                //1$
+                BossBarManager.removeBossBar(player);
                 EcoAPI.addBalance(player, 1);
-                String d_iron_msg = "§a+1$, +2xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(d_iron_msg));
-                //2xp
-                String d_iron_pJob = JobPROV.getCJob(player);
-                int d_iron_c_xp = JobPROV.getCXP(player, d_iron_pJob);
-                int d_iron_xp = d_iron_c_xp + 2;
-                JobPROV.updateCXP(player, d_iron_xp, d_iron_pJob);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+1$, +2xp"));
+                xpIncrement = 2;
                 break;
 
             case COPPER_ORE:
-                //1$
-                EcoAPI.addBalance(player, 1);
-                String cop_msg = "§a+1$, +1xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(cop_msg));
-                //1xp
-                String cop_pJob = JobPROV.getCJob(player);
-                int cop_c_xp = JobPROV.getCXP(player, cop_pJob);
-                int cop_xp = cop_c_xp + 1;
-                JobPROV.updateCXP(player,cop_xp,cop_pJob);
-                break;
-
             case DEEPSLATE_COPPER_ORE:
+                BossBarManager.removeBossBar(player);
                 EcoAPI.addBalance(player, 1);
-                String d_cop_msg = "§a+1$, +1xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(d_cop_msg));
-                //1xp
-                String d_cop_pJob = JobPROV.getCJob(player);
-                int d_cop_c_xp = JobPROV.getCXP(player, d_cop_pJob);
-                int d_cop_xp = d_cop_c_xp + 1;
-                JobPROV.updateCXP(player,d_cop_xp,d_cop_pJob);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+1$, +1xp"));
+                xpIncrement = 1;
                 break;
 
             case GOLD_ORE:
-                //2$
-                EcoAPI.addBalance(player, 2);
-                String gold_msg = "§a+2$, +3xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(gold_msg));
-                //3xp
-                String gold_pJob = JobPROV.getCJob(player);
-                int gold_c_xp = JobPROV.getCXP(player, gold_pJob);
-                int gold_xp = gold_c_xp + 2;
-                JobPROV.updateCXP(player,gold_xp,gold_pJob);
-                break;
-
             case DEEPSLATE_GOLD_ORE:
-                //2$
+                BossBarManager.removeBossBar(player);
                 EcoAPI.addBalance(player, 2);
-                String d_gold_msg = "§a+2$, +3xp";
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(d_gold_msg));
-                //3xp
-                String d_gold_pJob = JobPROV.getCJob(player);
-                int d_gold_c_xp = JobPROV.getCXP(player, d_gold_pJob);
-                int d_gold_xp = d_gold_c_xp + 2;
-                JobPROV.updateCXP(player,d_gold_xp,d_gold_pJob);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+2$, +3xp"));
+                xpIncrement = 3;
                 break;
 
             case REDSTONE_ORE:
-                //1$
-                //3xp
-                break;
-
             case DEEPSLATE_REDSTONE_ORE:
-                //1$
-                //3xp
+                BossBarManager.removeBossBar(player);
+                EcoAPI.addBalance(player, 3);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+3$, +2xp"));
+                xpIncrement = 2;
                 break;
 
             case EMERALD_ORE:
-                //6$
-                //15xp
-                break;
-
             case DEEPSLATE_EMERALD_ORE:
-                //6$
-                //15xp
+                BossBarManager.removeBossBar(player);
+                EcoAPI.addBalance(player, 6);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+6$, +15xp"));
+                xpIncrement = 15;
                 break;
 
             case LAPIS_ORE:
-                //4$
-                //7xp
-                break;
-
             case DEEPSLATE_LAPIS_ORE:
-                //4$
-                //7xp
+                BossBarManager.removeBossBar(player);
+                EcoAPI.addBalance(player, 4);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+4$, +7xp"));
+                xpIncrement = 7;
                 break;
 
             case DIAMOND_ORE:
-                //10$
-                //25xp
-                break;
-
             case DEEPSLATE_DIAMOND_ORE:
-                //10$
-                //25xp
+                BossBarManager.removeBossBar(player);
+                EcoAPI.addBalance(player, 10);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§a+10$, +25xp"));
+                xpIncrement = 25;
+
                 break;
 
             case ANCIENT_DEBRIS:
-                //20$
-                //50xp
+                BossBarManager.removeBossBar(player);
+                EcoAPI.addBalance(player, 20);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§c§l+20$, +50xp"));
+                xpIncrement = 50;
                 break;
+        }
+
+        if (xpIncrement > 0) {
+            int currentXP = JobPROV.getCXP(player, job);
+            int maxXP = JobPROV.getMXP(player, job);
+
+            if (currentXP >= maxXP)
+            {
+                int newMax = maxXP + 5000;
+                int newLevel = JobPROV.get_c_lvl(player) + 1;
+                int newCXP = 2;
+                JobPROV.updateMXP(player, newMax, job);
+                JobPROV.updateCXP(player, newCXP, job);
+                JobPROV.updateLVL(player, newLevel, job);
+                player.sendTitle("§6§k!!§r§6LEVEL UP§k!!", "§c" + JobPROV.get_c_lvl(player), 15, 15, 15);
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                BossBarManager.showBossBar(player, job, plugin);
+                return;
+            }
+
+            JobPROV.updateCXP(player, currentXP + xpIncrement, job);
+            BossBarManager.showBossBar(player, job, plugin);
         }
     }
 

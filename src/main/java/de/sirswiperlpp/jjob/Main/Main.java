@@ -4,6 +4,7 @@ import de.sirswiperlpp.jjob.Commands.JobCommand;
 import de.sirswiperlpp.jjob.Lang.Language;
 import de.sirswiperlpp.jjob.Listener.MinerListener;
 import de.sirswiperlpp.jjob.Listener.PlayerListener;
+import de.sirswiperlpp.jjob.Manager.BlockDataManager;
 import de.sirswiperlpp.jjob.Provider.JobPROV;
 import de.sirswiperlpp.jjob.SQL.JobSQL;
 import de.sirswiperlpp.jjob.SQL.MySQL;
@@ -69,7 +70,7 @@ public final class Main extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new PlayerListener(), this);
-        pm.registerEvents(new MinerListener(), this);
+        pm.registerEvents(new MinerListener(this, new BlockDataManager()), this);
 
         getCommand("job").setExecutor(new JobCommand());
     }

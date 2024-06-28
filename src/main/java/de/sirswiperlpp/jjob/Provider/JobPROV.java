@@ -188,4 +188,20 @@ public class JobPROV
         }
     }
 
+    public static void updateLVL(Player player, int lvl, String p_job)
+    {
+        try {
+            String query = "UPDATE j_xpTable SET c_lvl = ? WHERE player_name = ? AND job = ?";
+            try (PreparedStatement statement = JobSQL.getConnection().prepareStatement(query)) {
+                statement.setInt(1, lvl);
+                statement.setString(2, player.getName());
+                statement.setString(3, p_job);
+                statement.executeUpdate();
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
