@@ -19,7 +19,7 @@ public class BossBarManager {
     public static void showBossBar(Player player, String job, Main plugin) {
         int currentXP = JobPROV.getCXP(player, job);
         int maxXP = JobPROV.getMXP(player, job);
-        int lvl = JobPROV.get_c_lvl(player);
+        int lvl = JobPROV.get_c_lvl(player, job);
 
         if (currentXP == -1 || maxXP == -1) {
             player.sendMessage("Error retrieving XP values.");

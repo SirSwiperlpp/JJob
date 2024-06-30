@@ -2,12 +2,15 @@ package de.sirswiperlpp.jjob.Main;
 
 import de.sirswiperlpp.jjob.Commands.JobCommand;
 import de.sirswiperlpp.jjob.Lang.Language;
+import de.sirswiperlpp.jjob.Listener.FarmerListener;
+import de.sirswiperlpp.jjob.Listener.LumberjackListener;
 import de.sirswiperlpp.jjob.Listener.MinerListener;
 import de.sirswiperlpp.jjob.Listener.PlayerListener;
 import de.sirswiperlpp.jjob.Manager.BlockDataManager;
 import de.sirswiperlpp.jjob.Provider.JobPROV;
 import de.sirswiperlpp.jjob.SQL.JobSQL;
 import de.sirswiperlpp.jjob.SQL.MySQL;
+import de.sirswiperlpp.jjob.TabCom.JobTab;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
@@ -71,8 +74,11 @@ public final class Main extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new PlayerListener(), this);
         pm.registerEvents(new MinerListener(this, new BlockDataManager()), this);
+        pm.registerEvents(new LumberjackListener(this, new BlockDataManager()), this);
+        pm.registerEvents(new FarmerListener(this, new BlockDataManager()), this);
 
         getCommand("job").setExecutor(new JobCommand());
+        getCommand("job").setTabCompleter(new JobTab());
     }
 
     @Override

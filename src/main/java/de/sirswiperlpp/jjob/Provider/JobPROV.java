@@ -93,12 +93,13 @@ public class JobPROV
         }
     }
 
-    public static int get_c_lvl(Player player)
+    public static int get_c_lvl(Player player, String Job)
     {
         try {
-            String query = "SELECT c_lvl, job FROM j_xpTable WHERE player_name = ?";
+            String query = "SELECT c_lvl FROM j_xpTable WHERE player_name = ? AND job = ?";
             try (PreparedStatement statement = JobSQL.getConnection().prepareStatement(query)) {
                 statement.setString(1, player.getName());
+                statement.setString(2, Job);
 
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {

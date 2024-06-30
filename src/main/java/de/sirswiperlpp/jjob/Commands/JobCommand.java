@@ -50,7 +50,7 @@ public class JobCommand implements CommandExecutor {
                     case "miner":
                         JobPROV.updatePlayer(player, "miner");
 
-                        if (Objects.equals(JobPROV.get_c_lvl(player), -1))
+                        if (Objects.equals(JobPROV.get_c_lvl(player, "miner"), -1))
                         {
                             Bukkit.getServer().getLogger().warning(player.getName() + " wasnt found in XPEntry.. Creating him..");
                             JobPROV.createXPEntry(player, "miner");
@@ -62,29 +62,38 @@ public class JobCommand implements CommandExecutor {
 
                     case "farmer":
                         JobPROV.updatePlayer(player, "farmer");
+
+                        if (Objects.equals(JobPROV.get_c_lvl(player, "farmer"), -1))
+                        {
+                            Bukkit.getServer().getLogger().warning(player.getName() + " wasnt found in XPEntry.. Creating him..");
+                            JobPROV.createXPEntry(player, "farmer");
+                            Bukkit.getServer().getLogger().warning("Entry for player " + player.getName() + " (Farmer job) created!");
+                        }
+
                         player.sendMessage(language.get("prefix") + language.translateString("job.joined", "Farmer"));
                         break;
 
                     case "lumberjack":
                         JobPROV.updatePlayer(player, "lumberjack");
+
+                        if (Objects.equals(JobPROV.get_c_lvl(player, "lumberjack"), -1))
+                        {
+                            Bukkit.getServer().getLogger().warning(player.getName() + " wasnt found in XPEntry.. Creating him..");
+                            JobPROV.createXPEntry(player, "lumberjack");
+                            Bukkit.getServer().getLogger().warning("Entry for player " + player.getName() + " (Lumberjack job) created!");
+                        }
+
                         player.sendMessage(language.get("prefix") + language.translateString("job.joined", "Lumberjack"));
                         break;
 
                     case "headhunter":
-                        JobPROV.updatePlayer(player, "headhunter");
-                        player.sendMessage(language.get("prefix") + language.translateString("job.joined", "§4Head-Hunter"));
+                        player.sendMessage(language.get("prefix") + "Headhunter ist noch unter Entwicklung..");
                         break;
 
                     default:
                         player.sendMessage(language.get("prefix") + "use: §c/job join <miner | farmer | lumberjack | headhunter>");
                         break;
                 }
-                break;
-
-            case "leave":
-                break;
-
-            case "info":
                 break;
 
             default:
